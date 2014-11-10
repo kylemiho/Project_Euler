@@ -10,6 +10,7 @@ using namespace std;
 void FILLTHEFILE(vector<int> &thousandDigits)
 {
 	string buffer;
+	stringstream otherBuffer;
 	int haha;
 	
 	//opens the textfile
@@ -25,23 +26,57 @@ void FILLTHEFILE(vector<int> &thousandDigits)
 	while (!thousand.eof())
 	{
 		//we got the input, but now need to convert then parse it
-		getline(thousand,buffer);
+		getline(thousand, buffer);
 
-		stringstream converter(buffer.c_str());
-		converter >> haha;
-		cout << haha << flush;
-
+		//parses line, and then adds numbers into vector seperately
+		for (unsigned i = 0; i < buffer.size(); ++i)
+		{
+			//use string stream to convert char to int
+			otherBuffer << buffer.at(i);
+			otherBuffer >> haha;
+			//add int to vector
+			thousandDigits.push_back(haha);
+			//clear stringstream to allow reuse
+			otherBuffer.clear();
+		}
 	}
-	cout << endl;
 	thousand.close();
 	return;
+}
+
+long long calculateLargest13(const vector<int> &thousandDigits)
+{
+	//need to go through every single digit, but we stop at 13 digits before the vector ends to prevent going out of range
+	long long int largestProduct = 0;
+	long long int currentProduct = 1;
+	for (unsigned i = 0; i < thousandDigits.size() - 12; ++i)
+	{
+
+		currentProduct = 1;
+		for (unsigned j = i; j < i + 13; ++j)
+		{
+			currentProduct *= thousandDigits.at(j);
+		}
+		if (currentProduct > largestProduct)
+		{
+			cout << "New largest product: " << currentProduct << " ";
+			for (unsigned k = i; k < i + 13; ++k)
+			{
+				cout << thousandDigits.at(k) << " ";
+			}
+			cout << endl;
+			largestProduct = currentProduct;
+		}
+	}
+	return largestProduct;
 }
 
 int main()
 {
 	vector<int> thousandDigits;
 	FILLTHEFILE(thousandDigits);
-	
+	long long answer = calculateLargest13(thousandDigits);
+	cout << "The largest product between 13 adjacent digits is: " << answer << endl;
 
 	return 0;
 }
